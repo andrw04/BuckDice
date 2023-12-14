@@ -1,109 +1,114 @@
 ﻿using BuckDice.Domain.Models;
-using System.Drawing;
 
 namespace BuckDice.Server
 {
     public class Game
     {
         public Queue<Player> PlayerTurnOrder { get; set; }
-        public bool GameCompleted { get; } = false;
-        public bool GameStarted { get; } = false;
+        public bool GameCompleted { get; private set; } = false;
+        public bool GameStarted { get; private set; } = false;
         public Player CurrentTurn { get => PlayerTurnOrder.Peek(); }
 
-        // "Очко" количество очков, которое нужно набрать
+        private int Buck = 15;
+        private int SmallBuck = 5;
+
+        // "Очко" количество очков, которое нужно набрать для победы
         public int Point { get; set; } = 0;
 
-        public void StartGame()
+        public void AddPlayer(Player player)
         {
             if (GameStarted)
                 throw new Exception("Game already started!");
 
-            if (GameCompleted)
-                throw new Exception("Game already completed!");
-
-            if (Point == 0)
-                throw new Exception("Point is undefined!");
-
-
+            PlayerTurnOrder.Enqueue(player);
         }
 
-        public void SetTurnOrder()
-        {
-
-        }
-
-        // Последний игрок бросает одну кость и это и есть "Очко"
-        public void GetPoint(Player player, RollOneDice roll)
-        {
-            var lastPlayerUsername = PlayerTurnOrder.Last().Username;
-
-            if (lastPlayerUsername == player.Username)
-            {
-                Point = roll.Dice;
-            }
-        }
-
-
-
-
-/*        public void AddPlayer(string username)
-        {
-            if (!GameStarted)
-            {
-                PlayerTurnOrder.Enqueue(new Player() { Username = username, Points = 0 });
-            }
-            else
-            {
-                throw new Exception("Game already started!");
-            }
-        }
-
-        public void StartGame()
-        {
-            if (GameStarted)
-            {
-                throw new Exception("Game already started!");
-            }
-
-            if (PlayerTurnOrder.All(p => p.Points > 0))
-            {
-                GameStarted = true;
-
-                var players = PlayerTurnOrder.ToArray();
-
-                PlayerTurnOrder = new Queue<Player>(players
-                    .OrderByDescending(player => player.Points));
-
-                foreach (var player in players)
-                {
-                    player.Points = 0;
-                }
-            }
-            else
-            {
-                throw new Exception("Not all players rolled the dice!");
-            }
-        }
-
-        public void RollTheDice(int points)
+        public List<int> TurnRollTheDice()
         {
             if (!GameCompleted)
             {
-                // Получаем текущего игрока
-                var currentPlayer = PlayerTurnOrder.Dequeue();
+                Random rand = new Random();
 
-                // Прибавляем его результат
-                currentPlayer.Points += points;
+                List<int> rolls = new();
 
-                // Возвращаем в конец очереди
-                PlayerTurnOrder.Enqueue(currentPlayer);
+                // Подбрасывание трех кубиков
+                for (int i = 0; i < 3; i++)
+                {
+                    rolls.Add(rand.Next(1, 6));
+                }
+
+                var player = PlayerTurnOrder.Peek();
+
+                if (rolls.All(r => r.Equals(Point))) // Большой бак
+                {
+                    player.Points = Buck;
+                }
+                else if (rolls.All(r => r.Equals(rolls[0]) && !r.Equals(Point))) // малый бак
+                {
+                    player.Points += SmallBuck;
+                }
+                else
+                {
+                    player.Points += rolls.Where(r => r.Equals(Point)).Count();
+                }
+
+                PlayerTurnOrder.Dequeue();
+
+                if (!CheckBuck(player))
+                {
+                    PlayerTurnOrder.Enqueue(player);
+                }
+
+                CheckEndGame();
+
+                return rolls;
             }
-        }*/
+            else
+            {
+                throw new Exception("Game is already completed!");
+            }
 
-        // получить список игроков, отсортированный по имени
-        public List<Player> GetPlayerScores()
+        }
+
+        private bool CheckBuck(Player player) => player.Points >= Buck;
+
+        private bool CheckEndGame()
         {
-            return PlayerTurnOrder.OrderBy(player => player.Username).ToList();
+            if (PlayerTurnOrder.Count == 1)
+            {
+                GameCompleted = true;
+            }
+
+            return GameCompleted;
+        }
+
+        public void StartGame()
+        {
+            if (!GameStarted)
+            {
+                Dictionary<string, int> rolls = new Dictionary<string, int>();
+                Random rand = new Random();
+
+                foreach (var player in PlayerTurnOrder)
+                {
+                    int rollSum = rand.Next(1, 6) + rand.Next(1, 6) + rand.Next(1, 6);
+
+                    rolls.Add(player.Username, rollSum);
+                }
+
+                // Формируем порядок ходов игроков
+                PlayerTurnOrder.OrderByDescending(p => rolls[p.Username]);
+
+                // Определяем "Очко"
+                Point = rand.Next(1, 6);
+
+                // Игра началась
+                GameStarted = true;
+            }
+            else
+            {
+                throw new Exception("Game already started!");
+            }
         }
     }
 }
