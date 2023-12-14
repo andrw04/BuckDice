@@ -1,4 +1,4 @@
-﻿namespace BuckDice.Server.Models
+﻿namespace BuckDice.Domain.Models
 {
     public class RollOneDice
     {

@@ -4,6 +4,10 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>3d1ffb74-7dc1-46d1-8d66-4acbae77a2e3</UserSecretsId>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\BuckDice.Domain\BuckDice.Domain.csproj" />
+  </ItemGroup>
 </Project>

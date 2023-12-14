@@ -4,8 +4,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 17.8.34330.188
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuckDice.Server", "BuckDice.Server\BuckDice.Server.csproj", "{B6664827-A987-425E-96D6-30A4BAB2522D}"
+	ProjectSection(ProjectDependencies) = postProject
+		{913E233A-1C43-449B-8959-0261739552FA} = {913E233A-1C43-449B-8959-0261739552FA}
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuckDice.Client", "BuckDice.Client\BuckDice.Client.csproj", "{D7DFCC87-D58D-4C7A-A4B6-D28034D31E63}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuckDice.Domain", "BuckDice.Domain\BuckDice.Domain.csproj", "{913E233A-1C43-449B-8959-0261739552FA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +26,10 @@ Global
 		{D7DFCC87-D58D-4C7A-A4B6-D28034D31E63}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D7DFCC87-D58D-4C7A-A4B6-D28034D31E63}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D7DFCC87-D58D-4C7A-A4B6-D28034D31E63}.Release|Any CPU.Build.0 = Release|Any CPU
+		{913E233A-1C43-449B-8959-0261739552FA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{913E233A-1C43-449B-8959-0261739552FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{913E233A-1C43-449B-8959-0261739552FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{913E233A-1C43-449B-8959-0261739552FA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

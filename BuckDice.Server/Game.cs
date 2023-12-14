@@ -1,4 +1,4 @@
-﻿using BuckDice.Server.Models;
+﻿using BuckDice.Domain.Models;
 using System.Drawing;
 
 namespace BuckDice.Server
@@ -10,7 +10,7 @@ namespace BuckDice.Server
         public bool GameStarted { get; } = false;
         public Player CurrentTurn { get => PlayerTurnOrder.Peek(); }
 
-        // "Очко", колчиество, которое очков, которое нужно набрать
+        // "Очко" количество очков, которое нужно набрать
         public int Point { get; set; } = 0;
 
         public void StartGame()
