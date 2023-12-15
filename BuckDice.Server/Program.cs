@@ -1,7 +1,10 @@
+using BuckDice.Server;
 using BuckDice.Server.Hubs;
 using Microsoft.AspNetCore.ResponseCompression;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddSingleton<GameManager>();
 
 builder.Services.AddSignalR();
 

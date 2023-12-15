@@ -1,0 +1,17 @@
+﻿@page "/buckdice"
+@inject GameManager gameManager
+@inject NavigationManager Navigation
+
+
+<ConnectionComponent></ConnectionComponent>
+<GameField></GameField>
+
+
+
+@code
+{
+    protected async override Task OnInitializedAsync()
+    {
+        await gameManager.StartAsync(Navigation);
+    }
+}

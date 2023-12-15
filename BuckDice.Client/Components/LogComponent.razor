@@ -1,0 +1,22 @@
+﻿@inject GameManager gameManager
+@implements IDisposable
+
+<ul>
+    @foreach (var message in gameManager.Messages)
+    {
+        <li>@message</li>
+    }
+</ul>
+
+@code
+{
+    protected async override Task OnInitializedAsync()
+    {
+        gameManager.GameStateChanged += StateHasChanged;
+    }
+
+    public void Dispose()
+    {
+        gameManager.GameStateChanged += StateHasChanged;
+    }
+}

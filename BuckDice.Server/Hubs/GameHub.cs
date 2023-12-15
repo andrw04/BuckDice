@@ -1,60 +1,67 @@
-﻿using BuckDice.Server.Models;
-using Microsoft.AspNetCore.SignalR;
+﻿using Microsoft.AspNetCore.SignalR;
 
 namespace BuckDice.Server.Hubs
 {
     public class GameHub : Hub
     {
-        private Dictionary<string, Game> _games { get; set; } // ключ = имя группы
+        private GameManager _gameManager;
 
-        public async Task Enter(string username, string groupname)
+        public GameHub(GameManager manager)
         {
-            if (!String.IsNullOrEmpty(username))
+            _gameManager = manager;
+        }
+
+        public async Task Register(string groupname, string username)
+        {
+            if (!string.IsNullOrEmpty(groupname) && !string.IsNullOrEmpty(username))
             {
-                await Groups.AddToGroupAsync(Context.ConnectionId, groupname);
-
-/*                if (!_games.ContainsKey(groupname))
+                try
                 {
-                    _games.Add(groupname, new Game());
-                    _games[groupname].AddPlayer(username);
-                }*/
+                    await _gameManager.Register(groupname, username);
 
-                await Clients.Group(groupname).SendAsync("Notify", $"{username} connected");
+                    await Groups.AddToGroupAsync(Context.ConnectionId, groupname);
+
+                    await Clients.Group(groupname).SendAsync("Notify", $"{username} is connected.");
+
+                    if (_gameManager.IsStartedGame(groupname))
+                    {
+                        await Clients.Group(groupname).SendAsync("Notify", $"Game {groupname} is started.");
+
+                        await Clients.Group(groupname).SendAsync("UpdateGameState",
+                            _gameManager.IsStartedGame(groupname), _gameManager.IsCompletedGame(groupname),
+                            _gameManager.GetPlayers(groupname), _gameManager.GetPoint(groupname));
+                    }
+                }
+                catch (Exception ex)
+                {
+                    await Clients.Caller.SendAsync("Notify", ex.Message);
+                }
+            }
+            else
+            {
+                await Clients.Caller.SendAsync("Notify", "Groupname or username is empty.");
+            }
+        }
+
+        public async Task RollTheDice(string groupname)
+        {
+            if (!string.IsNullOrEmpty(groupname))
+            {
+                try
+                {
+                    var diceRolls = _gameManager.RollTheDice(groupname);
+
+                    await Clients.Group(groupname).SendAsync("UpdateDice", diceRolls);
+
+                    await Clients.Group(groupname).SendAsync("UpdateGameState",
+                        _gameManager.IsStartedGame(groupname), _gameManager.IsCompletedGame(groupname),
+                        _gameManager.GetPlayers(groupname), _gameManager.GetPoint(groupname));
+                }
+                catch (Exception ex)
+                {
+                    await Clients.Group(groupname).SendAsync("Notify", ex.Message);
+                }
             }
         }
     }
-
-
-    /*public class GameHub : Hub
-    {
-        List<PlayersGroup> _groups { get; set; } = new();
-        public GameHub()
-        {
-            _groups.Add(new PlayersGroup("Gr 1"));
-        }
-
-        public async Task SendGroupList()
-        {
-            await Clients.Caller.SendAsync("RecieveGroupList", _groups.Select(gr => gr.GroupName));
-        }
-
-        public async Task Enter(string groupName, string username)
-        {
-            var group = _groups.FirstOrDefault(x => x.GroupName == groupName);
-
-            if (group != null)
-            {
-                await Groups.AddToGroupAsync(Context.ConnectionId, groupName);
-
-                await Clients.Caller.SendAsync("Notify", $"Connected to group {groupName}");
-
-                group.Players.Add(username);
-            }
-        }
-
-        public async Task CreateGroup()
-        {
-            _groups.Add(new PlayersGroup($"Game {_groups.Count() + 1}"));
-        }
-    }*/
 }

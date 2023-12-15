@@ -1,0 +1,29 @@
+﻿@inject GameManager gameManager
+@implements IDisposable
+
+@if (!gameManager.GameStarted)
+{
+    <label for="username">Username:</label>
+    <input type="text" @bind="gameManager.Username" id="username" class="form-control" />
+
+    <label for="groupname">Groupname:</label>
+    <input type="text" @bind="gameManager.GroupName" id="groupName" class="form-control" />
+    <br />
+    <button @onclick="gameManager.ConnectGroup"  class="btn btn-primary">Connect</button>
+    <br />
+
+    <LogComponent></LogComponent>
+}
+
+@code
+{
+    protected async override Task OnInitializedAsync()
+    {
+        gameManager.GameStateChanged += StateHasChanged;
+    }
+
+    public void Dispose()
+    {
+        gameManager.GameStateChanged += StateHasChanged;
+    }
+}
